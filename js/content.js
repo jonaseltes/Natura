@@ -118,6 +118,9 @@ function init() {
     //controls.damping = 0.2;
     controls.update();
     console.log("controls: " ,controls);
+    controls.enabled = false;
+    // controls.enableRotate = false;
+    // controls.enablePan = false;
     //controls.object.position.y = 50;
     //var targetV = new THREE.Vector3(0, 5, 0);
     
