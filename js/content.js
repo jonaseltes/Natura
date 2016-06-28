@@ -89,7 +89,7 @@ function init() {
     //     forestSounds.play();
     // }
     console.log("forestSounds: " ,forestSounds);
-    //handle_startMonitoring();
+    handle_startMonitoring();
 
     //scene
     scene = new THREE.Scene();
