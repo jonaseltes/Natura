@@ -90,7 +90,7 @@ function handle_stopMonitoring() {
     webRtcSource = null; 
 }
 
-$(function(){
-  handle_startMonitoring();
-  //bindEvents();
-});
+// $(function(){
+//   handle_startMonitoring();
+//   //bindEvents();
+// });

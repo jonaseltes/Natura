@@ -19,7 +19,13 @@ var lightsGroup;
 var time;
 var spriteClone;
 var go = false;
+var treeMat;
+var forestSounds;
 //var plight;
+var trees = [
+        0, 1, 2, 3
+    ];
+
 
 detect();
 
@@ -76,14 +82,14 @@ function init() {
     // loaderElem.style.display = "block";
 
 
-    var forestSounds = document.getElementById("environment");
+    forestSounds = document.getElementById("environment");
     //forestSounds.volume = 0.8;
     forestSounds.loop = true;
     // forestSounds.onended = function(){
     //     forestSounds.play();
     // }
     console.log("forestSounds: " ,forestSounds);
-
+    //handle_startMonitoring();
 
     //scene
     scene = new THREE.Scene();
@@ -141,7 +147,7 @@ function init() {
 		// Function when resource is loaded
 		function (result) {
 		    scene = result;
-            console.log("result: " ,result);
+            console.log("result: " ,scene);
 		    processScene(scene);
 
 		},
@@ -312,7 +318,7 @@ function generateLights(positionX, positionY, sprite){
 function generateTrees(numberOfTrees){
 
     var textureLoader = new THREE.TextureLoader();
-    var map = textureLoader.load("app/circle2.png");
+    var map = textureLoader.load("textures/circle2.png");
     map.minFilter = THREE.NearestFilter;
     map.magFilter = THREE.NearestFilter;
     var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { map: map, fog: false } ) );
@@ -334,14 +340,10 @@ function generateTrees(numberOfTrees){
     //scene.add(spriteClone);
     
 
-    var trees = [
-        0, 1, 4, 5
-    ];
-
     var renderedLights = 0;
 
     for (i = 0; i < numberOfTrees; i++) {
-        console.log("cloning tree nr: " ,i);
+        //console.log("cloning tree nr: " ,i);
         var randomIndex = Math.floor(Math.random() * 4);
         randomIndex = trees[randomIndex];
         var newTree = scene.children[randomIndex].clone();
@@ -394,29 +396,46 @@ function processScene(scene) {
 
     sceneBB = new THREE.Geometry(); //for computing the scene BB
     var mesh = null;
+    treeMat = new THREE.MeshPhongMaterial({
+                  color      :  new THREE.Color("rgb(10,10,10)"),
+                  emissive   :  new THREE.Color("rgb(50,50,50)"),
+                  specular   :  new THREE.Color("rgb(250,250,250)"),
+                  shininess  :  5,
+                  shading    :  THREE.FlatShading,
+                  transparent: true,
+                  opacity    : 1,
+                  fog        : true
+                });
+
+    var normMat = new THREE.MeshNormalMaterial( { opacity: 1, transparent: true, fog: true} );
+
+    console.log("children: " ,scene.children);
 
     for (i = 0; i < scene.children.length; i++) {
 
-
+        var child = scene.children[i];
         //scene.children.length
 
+
         //console.log("scene.children[i]: " ,scene.children[i].type);
-        var randomIndex = Math.floor(Math.random() * scene.children.length-2);
 
         switch (scene.children[i].type) {
             case "Line":
 
-                sceneBB.merge(scene.children[i].geometry);
-                selectable.push(scene.children[i]);
-                addLayer(scene.children[i]);
+                // sceneBB.merge(scene.children[i].geometry);
+                // selectable.push(scene.children[i]);
+                // addLayer(scene.children[i]);
+                scene.remove(scene.children[i]);
 
                 break;
 
             case "Points":
             case "PointCloud":
 
-                selectable.push(scene.children[i]);
-                addLayer(scene.children[i]);
+                // selectable.push(scene.children[i]);
+                // addLayer(scene.children[i]);
+
+                scene.remove(scene.children[i]);
 
                 break;
 
@@ -431,7 +450,15 @@ function processScene(scene) {
                 if (i == 6) {
                     scene.children[i].scale.set(4,4,4);
                 }
-                scene.add(scene.children[i]);
+
+                if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4){
+                    //scene.children[i].material = treeMat;
+                }
+
+                // if (i == 5) {
+                //     scene.children[i].material = normMat;
+                // }
+                //scene.add(scene.children[i]);
 
                 break;
 
@@ -439,33 +466,37 @@ function processScene(scene) {
 
                 console.log("DirectionalLight: " ,scene.children[i]);
                 scene.children[i].castShadow = true;
-                //scene.children[i].shadowCameraVisible = true;
-
-                scene.children[i].shadowMapWidth = 4096;
-                scene.children[i].shadowMapHeight = 4096;
-
+                // scene.children[i].shadowMapWidth = 4096;
+                // scene.children[i].shadowMapHeight = 4096;
                 sceneBB.computeBoundingSphere();
+                // child.position.z = 50;
+                // child.position.y = 50;
+                // child.position.x = 50;
 
                 var d = sceneBB.boundingSphere.radius;
 
-                scene.children[i].shadowCameraLeft = -d;
-                scene.children[i].shadowCameraRight = d;
-                scene.children[i].shadowCameraTop = d;
-                scene.children[i].shadowCameraBottom = -d;
+                // scene.children[i].shadowCameraLeft = -d;
+                // scene.children[i].shadowCameraRight = d;
+                // scene.children[i].shadowCameraTop = d;
+                // scene.children[i].shadowCameraBottom = -d;
 
-                scene.children[i].shadowCameraNear = 10;
-                scene.children[i].shadowCameraFar = d * 2;
+                // scene.children[i].shadowCameraNear = 10;
+                // scene.children[i].shadowCameraFar = d * 2;
 
-                scene.children[i].shadowDarkness = 0.2;
-                scene.children[i].shadowBias = -0.00001;
-                scene.children[i].intensity = 0.7;
+                // scene.children[i].shadowDarkness = 0.2;
+                // scene.children[i].shadowBias = -0.00001;
+                scene.children[i].intensity = 0.5;
+
+                scene.remove(scene.children[i]);
 
                 break;
 
             case "SpotLight":
-                console.log("SpotLight: " ,scene.children[i]);
+                // console.log("SpotLight: " ,scene.children[i]);
                 scene.children[i].castShadow = true;
-                //also need to add spotlight parameters
+                // //also need to add spotlight parameters
+
+                //scene.remove(scene.children[i]);
 
                 break;
 
@@ -493,12 +524,14 @@ function processScene(scene) {
 
             case "Group":
 
-                selectable.push(scene.children[i]);
-                addLayer(scene.children[i]);
+                // selectable.push(scene.children[i]);
+                // addLayer(scene.children[i]);
 
-                var gBBox = new THREE.BoundingBoxHelper(scene.children[i], 0x888888);
-                gBBox.update();
-                sceneBB.mergeMesh(gBBox);
+                // var gBBox = new THREE.BoundingBoxHelper(scene.children[i], 0x888888);
+                // gBBox.update();
+                // sceneBB.mergeMesh(gBBox);
+
+                scene.remove(scene.children[i]);
 
                 break;
 
@@ -724,7 +757,7 @@ function onZoomSelected(event) {
 
 function onClick(event) {
 
-    
+    forestSounds.play();
 
     var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
 
