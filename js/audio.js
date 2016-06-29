@@ -6,7 +6,8 @@ var convolver2;
 var filter;
  
 function handle_startMonitoring() {
-    audioContext  = new (window.AudioContext || window.webKitAudioContext)();
+    var aContext = window.AudioContext || window.webkitAudioContext;
+    audioContext  = new aContext();
     tuna = new Tuna(audioContext);
     convolver = audioContext.createConvolver();
     var soundSource, concertHallBuffer;
